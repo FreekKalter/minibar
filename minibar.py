@@ -7,6 +7,7 @@ import time
 
 url = "http://www.grolschwkactie.nl"
 cookies = dict(age='26')
+timeformat = "%a %d-%m %H:%M"
 
 def get_participants():
     r = requests.get(url, cookies=cookies)
@@ -16,7 +17,7 @@ def get_participants():
 
 def write_new_participants(l, par):
     d = datetime.utcnow()
-    l.append(d.strftime("%a %d-%m %H:%M") + " | " + str(par) + '\n')
+    l.append(d.strftime(timeformat) + " | " + str(par) + '\n')
     with open('out.log', 'w') as out:
         out.writelines(lines)
 
@@ -27,10 +28,11 @@ try:
 except IOError as e:
     write_new_participants(lines,get_participants())
 
+print datetime.utcnow().strftime(timeformat)
 highpar = -1
 for i in range(18):
     if i != 0:
-        time.sleep(22-i)
+        time.sleep(15-i)
     par = get_participants()
     if int(par) > highpar:
         highpar = int(par)
