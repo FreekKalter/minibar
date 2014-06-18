@@ -35,7 +35,10 @@ for i in range(18):
     if int(par) > highpar:
         highpar = int(par)
         print highpar
+    elif int(par) < highpar:
+        print par + " i at this moment" + str(i)
 
 if highpar >= 0:
     print("writing: ", highpar)
     write_new_participants(lines, highpar)
+print "----------------------------------------"
