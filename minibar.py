@@ -36,6 +36,6 @@ for i in range(18):
         highpar = int(par)
         print highpar
 
-if highpar => 0:
+if highpar >= 0:
     print("writing: ", highpar)
     write_new_participants(lines, highpar)
