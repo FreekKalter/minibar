@@ -32,7 +32,7 @@ print datetime.utcnow().strftime(timeformat)
 highpar = -1
 for i in range(18):
     if i != 0:
-        time.sleep(15-i)
+        time.sleep(20-i)
     par = get_participants()
     if int(par) > highpar:
         highpar = int(par)
