@@ -6,14 +6,17 @@ import sys
 import time
 
 url = "http://www.grolschwkactie.nl"
-cookies = dict(age='26')
 timeformat = "%a %d-%m %H:%M"
-# look into requests.Session()
+session = requests.Session()
+a = requests.adapters.HTTPAdapter(max_retries=5)
+session.mount('http://',a)
+session.cookies = requests.utils.cookiejar_from_dict(dict(age='26'))
 
 def get_participants():
     try:
-        r = requests.get(url, cookies=cookies)
+        r = session.get(url)
     except Exception as e:
+        print "CONNECTION EXCEPTION"
         print e
     soup = BeautifulSoup(r.text)
     par = soup.find("span", "participants").string
@@ -45,10 +48,11 @@ for i in range(18):
         elif int(par) < highpar:
             print "number of times checked before exiting: " + str(i)
             break
-    except ValueError:
-        print "par at moment of exception: " + par
+    except ValueError as e:
+        print e
         continue
 
+session.close()
 if highpar >= 0:
     print("writing: ", highpar)
     write_new_participants(lines, highpar)
