@@ -8,9 +8,13 @@ import time
 url = "http://www.grolschwkactie.nl"
 cookies = dict(age='26')
 timeformat = "%a %d-%m %H:%M"
+# look into requests.Session()
 
 def get_participants():
-    r = requests.get(url, cookies=cookies)
+    try:
+        r = requests.get(url, cookies=cookies)
+    except Exception as e:
+        print e
     soup = BeautifulSoup(r.text)
     par = soup.find("span", "participants").string
     return par.lstrip('0')
@@ -34,11 +38,16 @@ for i in range(18):
     if i != 0:
         time.sleep(20-i)
     par = get_participants()
-    if int(par) > highpar:
-        highpar = int(par)
-        print highpar
-    elif int(par) < highpar:
-        print par + " i at this moment" + str(i)
+    try:
+        if int(par) > highpar:
+            highpar = int(par)
+            print highpar
+        elif int(par) < highpar:
+            print "number of times checked before exiting: " + str(i)
+            break
+    except ValueError:
+        print "par at moment of exception: " + par
+        continue
 
 if highpar >= 0:
     print("writing: ", highpar)
