@@ -19,7 +19,10 @@ func main() {
 	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 	http.Handle("/", r)
-	http.ListenAndServe(":5000", r)
+	err := http.ListenAndServe(":5000", r)
+	if err != nil {
+		panic(err)
+	}
 }
 
 type tuple struct {
