@@ -4,10 +4,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -57,30 +55,50 @@ func api(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
+	stage1 := make([]map[string][]int64, 24)
+	for i := 0; i < 24; i++ {
+		stage1[i] = make(map[string][]int64)
+	}
 	scanner := bufio.NewScanner(f)
-	avgMap := make(map[string][]int64)
 	for scanner.Scan() {
-		tmp := strings.Split(scanner.Text(), "|")
-		t, err := time.Parse(timeFormat, strings.TrimRight(tmp[0], " "))
-		t1 := t.Round(time.Hour).Local()
-		t2 := t1.Add(-time.Hour)
-		if err != nil {
-			panic(err)
-		}
-		i, err := strconv.ParseInt(strings.TrimLeft(tmp[1], " "), 10, 32)
-		if err != nil {
-			panic(err)
-		}
-		name := fmt.Sprintf("%d-%d", t2.Hour(), t1.Hour())
-		avgMap[name] = append(avgMap[name], i)
+		// parse time
+		t, nr := parse_line(scanner.Text())
+		stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
 	}
-	list := make(TupleList, 0)
-	for k, v := range avgMap {
-		list = append(list, tuple{Name: k, Value: avg(v)})
+	list := make([]map[string]int64, 0)
+	for uur, weekdagen := range stage1 {
+		row := make(map[string]int64)
+		if uur == 0 {
+			for _, dag := range []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"} {
+				row[dag] = 0
+			}
+		}
+
+		row["Uur"] = int64(uur)
+		for dag, nrs := range weekdagen {
+			row[dag] = avg(nrs)
+		}
+		list = append(list, row)
 	}
-	sort.Sort(list)
+
 	jsonEncoder := json.NewEncoder(w)
 	jsonEncoder.Encode(list)
+}
+
+func parse_line(line string) (t time.Time, nr int64) {
+	tmp := strings.Split(line, "|")
+	var err error
+	timeFromFile, err := time.Parse(timeFormat, strings.TrimRight(tmp[0], " "))
+	if err != nil {
+		panic(err)
+	}
+	t = timeFromFile.Round(time.Hour).Local()
+	nr, err = strconv.ParseInt(strings.TrimLeft(tmp[1], " "), 10, 32)
+	if err != nil {
+		panic(err)
+	}
+	return t, nr
 }
 
 func avg(list []int64) int64 {

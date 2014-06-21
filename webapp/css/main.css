@@ -1,33 +1,10 @@
 .chart rect {
-  fill: #42833d;
+  fill: steelblue;
 }
-.axis text {
+
+.chart text {
+  fill: white;
   font: 10px sans-serif;
+  text-anchor: end;
 }
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  /*display: none;*/
-}
-
-.bar:hover{
-    fill: #13572e;
-}
-
-.bar:hover text{
-    fill: #000;
-}
-
-
-/**.chart text {*/*/
-/**fill: white;*/*/
-  /*font: 10px sans-serif;*/
-  /*text-anchor: middle;*/
-/*}*/
 
