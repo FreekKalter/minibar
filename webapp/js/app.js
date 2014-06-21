@@ -1,6 +1,6 @@
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 1600 - margin.left - margin.right,
+    width = 1800 - margin.left - margin.right,
     height = 700 - margin.top - margin.bottom;
 
 // axe scale
@@ -41,9 +41,8 @@ httpRequest.onreadystatechange = function () {
            }
     }
 
-  var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "Uur"; });
-
-  console.log(ageNames);
+  //var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "Uur"; });
+  ageNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].reverse();
   data.forEach(function(d) {
     d.ages = ageNames.map(function(name) { console.log(name); return {name: name, value: +d[name]}; });
   });
