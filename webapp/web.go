@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -48,8 +49,6 @@ func (t TupleList) Less(i, j int) bool {
 	return a < b
 }
 
-const timeFormat = "Mon 02-01 15:04"
-
 func api(w http.ResponseWriter, r *http.Request) {
 	f, err := os.Open("../out.log")
 	if err != nil {
@@ -70,6 +69,8 @@ func api(w http.ResponseWriter, r *http.Request) {
 	for uur, weekdagen := range stage1 {
 		row := make(map[string]int64)
 		if uur == 0 {
+			// hack to populate the first row with all the days, wich the javascript side will need,
+			// because it wil look in the first row know wich days it will encounter
 			for _, dag := range []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"} {
 				row[dag] = 0
 			}
@@ -86,10 +87,12 @@ func api(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder.Encode(list)
 }
 
+const timeFormat = "Mon 02-01 15:04 2006"
+
 func parse_line(line string) (t time.Time, nr int64) {
 	tmp := strings.Split(line, "|")
 	var err error
-	timeFromFile, err := time.Parse(timeFormat, strings.TrimRight(tmp[0], " "))
+	timeFromFile, err := time.Parse(timeFormat, fmt.Sprintf("%s 2014", strings.TrimRight(tmp[0], " ")))
 	if err != nil {
 		panic(err)
 	}

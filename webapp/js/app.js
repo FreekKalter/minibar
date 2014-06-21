@@ -1,7 +1,7 @@
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 1800 - margin.left - margin.right,
-    height = 700 - margin.top - margin.bottom;
+    width = 1500 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
 // axe scale
 var x0 = d3.scale.ordinal()
@@ -64,7 +64,7 @@ httpRequest.onreadystatechange = function () {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Population");
+      .text("Aantal codes ingevoerd");
 
   var state = svg.selectAll(".state")
       .data(data)
