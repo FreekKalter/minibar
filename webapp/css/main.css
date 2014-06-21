@@ -20,8 +20,13 @@
     fill: #13572e;
 }
 
-/*.chart text {*/
-  /*fill: white;*/
+.bar:hover text{
+    fill: #000;
+}
+
+
+/**.chart text {*/*/
+/**fill: white;*/*/
   /*font: 10px sans-serif;*/
   /*text-anchor: middle;*/
 /*}*/

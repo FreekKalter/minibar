@@ -57,7 +57,7 @@ httpRequest.onreadystatechange = function () {
       .text("Aantal codes ingevoerd");
 
 
-    chart.selectAll(".bar")
+    var bar = chart.selectAll(".bar")
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
@@ -65,6 +65,12 @@ httpRequest.onreadystatechange = function () {
       .attr("y", function(d) { return y(d.Value); })
       .attr("height", function(d) { return height - y(d.Value); })
       .attr("width", x.rangeBand());
+
+    bar.append("text")
+        .attr("x", function(d) { return x(d.Value) ; })
+        .attr("y", function(d) { return y(d.Value); })
+        //.attr("dy", "5em")
+        .text(function(d) { return d.Value; });
 
 }
 httpRequest.open('GET', "data")
