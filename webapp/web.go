@@ -17,6 +17,7 @@ import (
 
 func main() {
 	local := flag.Bool("local", false, "start on port 5000 for local 80 for public")
+	flag.Parse()
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "index.html") })
 	r.HandleFunc("/data", api)
@@ -25,9 +26,9 @@ func main() {
 	http.Handle("/", r)
 	var err error
 	if *local {
-		err = http.ListenAndServe(":80", r)
-	} else {
 		err = http.ListenAndServe(":5000", r)
+	} else {
+		err = http.ListenAndServe(":80", r)
 	}
 	if err != nil {
 		panic(err)
