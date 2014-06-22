@@ -68,14 +68,6 @@ func api(w http.ResponseWriter, r *http.Request) {
 	list := make([]map[string]int64, 0)
 	for uur, weekdagen := range stage1 {
 		row := make(map[string]int64)
-		if uur == 0 {
-			// hack to populate the first row with all the days, wich the javascript side will need,
-			// because it wil look in the first row know wich days it will encounter
-			for _, dag := range []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"} {
-				row[dag] = 0
-			}
-		}
-
 		row["Uur"] = int64(uur)
 		for dag, nrs := range weekdagen {
 			row[dag] = avg(nrs)

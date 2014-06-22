@@ -13,7 +13,7 @@ var y = d3.scale.linear()
     .range([height, 0]);
 
 var color = d3.scale.ordinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"].reverse());
 
 var xAxis = d3.svg.axis()
     .scale(x0)
@@ -41,10 +41,9 @@ httpRequest.onreadystatechange = function () {
            }
     }
 
-  //var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "Uur"; });
-  ageNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].reverse();
+  ageNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   data.forEach(function(d) {
-    d.ages = ageNames.map(function(name) { console.log(name); return {name: name, value: +d[name]}; });
+    d.ages = ageNames.map(function(name) { return {name: name, value: +d[name]}; });
   });
 
   x0.domain(data.map(function(d) { return d.Uur; }));
@@ -76,7 +75,7 @@ httpRequest.onreadystatechange = function () {
       .data(function(d) { return d.ages; })
     .enter().append("rect")
       .attr("width", x1.rangeBand())
-      .attr("x", function(d) { return x1(d.name); })
+      .attr("x", function(d) { return x1(d.name); }) //position in group
       .attr("y", function(d) { return y(d.value); })
       .attr("height", function(d) { return height - y(d.value); })
       .style("fill", function(d) { return color(d.name); });
@@ -85,7 +84,7 @@ httpRequest.onreadystatechange = function () {
       .data(ageNames.slice().reverse())
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) { return "translate(0," + (120 - (i * 20)) + ")"; });
 
   legend.append("rect")
       .attr("x", width - 18)
