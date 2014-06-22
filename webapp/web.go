@@ -19,6 +19,7 @@ func main() {
 	flag.Parse()
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "index.html") })
+	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
 	r.HandleFunc("/data", api)
 	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
@@ -32,21 +33,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-type tuple struct {
-	Name  string
-	Value int64
-}
-
-type TupleList []tuple
-
-func (t TupleList) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
-func (t TupleList) Len() int      { return len(t) }
-func (t TupleList) Less(i, j int) bool {
-	a, _ := strconv.ParseInt(strings.Split(t[i].Name, "-")[0], 10, 32)
-	b, _ := strconv.ParseInt(strings.Split(t[j].Name, "-")[0], 10, 32)
-	return a < b
 }
 
 func api(w http.ResponseWriter, r *http.Request) {
