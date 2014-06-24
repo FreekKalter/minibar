@@ -41,6 +41,7 @@ func api(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	//			  [uur] [ weekag ][ aantal_codes[] ]
 	stage1 := make([]map[string][]int64, 24)
 	for i := 0; i < 24; i++ {
 		stage1[i] = make(map[string][]int64)
@@ -51,18 +52,25 @@ func api(w http.ResponseWriter, r *http.Request) {
 		t, nr := parse_line(scanner.Text())
 		stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
 	}
-	list := make([]map[string]int64, 0)
+
+	stage2 := make([]map[string]interface{}, 0)
 	for uur, weekdagen := range stage1 {
-		row := make(map[string]int64)
-		row["Uur"] = int64(uur)
+		row := make(map[string]interface{})
+		//row["Uur"] = int64(uur)
+		if int(uur) == 0 {
+			row["Uur"] = "23-0"
+		} else {
+			row["Uur"] = fmt.Sprintf("%d-%d", uur-1, uur)
+		}
+
 		for dag, nrs := range weekdagen {
 			row[dag] = avg(nrs)
 		}
-		list = append(list, row)
+		stage2 = append(stage2, row)
 	}
 
 	jsonEncoder := json.NewEncoder(w)
-	jsonEncoder.Encode(list)
+	jsonEncoder.Encode(stage2)
 }
 
 const timeFormat = "Mon 02-01 15:04 2006"
@@ -82,10 +90,10 @@ func parse_line(line string) (t time.Time, nr int64) {
 	return t, nr
 }
 
-func avg(list []int64) int64 {
+func avg(stage2 []int64) int64 {
 	var total int64
-	for _, i := range list {
+	for _, i := range stage2 {
 		total += i
 	}
-	return int64(total / int64(len(list)))
+	return int64(total / int64(len(stage2)))
 }
