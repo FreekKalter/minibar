@@ -1,3 +1,4 @@
+from __future__ import print_function
 from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
@@ -16,8 +17,8 @@ def get_participants():
     try:
         r = session.get(url)
     except Exception as e:
-        print "CONNECTION EXCEPTION"
-        print e
+        print("CONNECTION EXCEPTION")
+        print(e)
     soup = BeautifulSoup(r.text)
     par = soup.find("span", "participants").string
     return par.lstrip('0')
@@ -35,7 +36,7 @@ try:
 except IOError as e:
     write_new_participants(lines,get_participants())
 
-print datetime.utcnow().strftime(timeformat)
+print(datetime.utcnow().strftime(timeformat))
 highpar = -1
 for i in range(18):
     if i != 0:
@@ -44,16 +45,16 @@ for i in range(18):
     try:
         if int(par) > highpar:
             highpar = int(par)
-            print highpar
+            print(highpar)
         elif int(par) < highpar:
-            print "number of times checked before exiting: " + str(i)
+            print("number of times checked before exiting: " + str(i))
             break
     except ValueError as e:
-        print e
+        print(e)
         continue
 
 session.close()
 if highpar >= 0:
-    print("writing: ", highpar)
+    print("writing: "+ highpar)
     write_new_participants(lines, highpar)
-print "----------------------------------------"
+print("----------------------------------------")
