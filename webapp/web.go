@@ -76,11 +76,12 @@ func api(w http.ResponseWriter, r *http.Request) {
 func parse_line(line string) (t time.Time, nr int64) {
 	tmp := strings.Split(line, "|")
 	var err error
-	timeFromFile, err := time.Parse(time.RFC1123, fmt.Sprintf("%s 2014", strings.TrimRight(tmp[0], " ")))
+	timeFromFile, err := time.Parse(time.RFC1123, strings.TrimRight(tmp[0], " "))
 	if err != nil {
 		panic(err)
 	}
-	t = timeFromFile.Round(time.Hour).Local()
+	location, _ := time.LoadLocation("Europe/Amsterdam")
+	t = timeFromFile.Round(time.Hour).In(location)
 	nr, err = strconv.ParseInt(strings.TrimLeft(tmp[1], " "), 10, 32)
 	if err != nil {
 		panic(err)
