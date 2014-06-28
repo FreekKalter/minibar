@@ -17,6 +17,10 @@ def deploy():
 
     # upload files
     put('minibar.py', deploypath )
+
+    # dirty fucking hack, putting of local webapp does not work
+    # if remote file has different permission, so delete it first
+    run('rm '+deploypath+'/webapp/webapp')
     put('webapp', deploypath )
     run('chmod +x '+deploypath+'/webapp/webapp')
 
