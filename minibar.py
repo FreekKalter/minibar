@@ -7,7 +7,7 @@ import sys
 import time
 
 url = "http://www.grolschwkactie.nl"
-timeformat = "%a %d-%m %H:%M"
+RFC1123 = "%a, %d %b %Y %H:%M:%S %Z"
 session = requests.Session()
 a = requests.adapters.HTTPAdapter(max_retries=5)
 session.mount('http://',a)
@@ -25,7 +25,7 @@ def get_participants():
 
 def write_new_participants(l, par):
     d = datetime.utcnow()
-    l.append(d.strftime(timeformat) + " | " + str(par) + '\n')
+    l.append(d.strftime(RFC1123) + " | " + str(par) + '\n')
     with open('out.log', 'w') as out:
         out.writelines(lines)
 
@@ -36,7 +36,7 @@ try:
 except IOError as e:
     write_new_participants(lines,get_participants())
 
-print(datetime.utcnow().strftime(timeformat))
+print(datetime.utcnow().strftime(RFC1123))
 highpar = -1
 for i in range(18):
     if i != 0:

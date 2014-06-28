@@ -73,12 +73,10 @@ func api(w http.ResponseWriter, r *http.Request) {
 	jsonEncoder.Encode(stage2)
 }
 
-const timeFormat = "Mon 02-01 15:04 2006"
-
 func parse_line(line string) (t time.Time, nr int64) {
 	tmp := strings.Split(line, "|")
 	var err error
-	timeFromFile, err := time.Parse(timeFormat, fmt.Sprintf("%s 2014", strings.TrimRight(tmp[0], " ")))
+	timeFromFile, err := time.Parse(time.RFC1123, fmt.Sprintf("%s 2014", strings.TrimRight(tmp[0], " ")))
 	if err != nil {
 		panic(err)
 	}
