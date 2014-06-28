@@ -5,9 +5,12 @@ from datetime import datetime
 import re
 import sys
 import time
+from pytz import timezone
+import pytz
 
 url = "http://www.grolschwkactie.nl"
 RFC1123 = "%a, %d %b %Y %H:%M:%S %Z"
+utc = pytz.utc
 session = requests.Session()
 a = requests.adapters.HTTPAdapter(max_retries=5)
 session.mount('http://',a)
@@ -24,7 +27,7 @@ def get_participants():
     return par.lstrip('0')
 
 def write_new_participants(l, par):
-    d = datetime.utcnow()
+    d = utc.localize(datetime.utcnow())
     l.append(d.strftime(RFC1123) + " | " + str(par) + '\n')
     with open('out.log', 'w') as out:
         out.writelines(lines)
@@ -36,7 +39,7 @@ try:
 except IOError as e:
     write_new_participants(lines,get_participants())
 
-print(datetime.utcnow().strftime(RFC1123))
+print(utc.localize(datetime.utcnow()).strftime(RFC1123))
 highpar = -1
 for i in range(18):
     if i != 0:
@@ -55,6 +58,6 @@ for i in range(18):
 
 session.close()
 if highpar >= 0:
-    print("writing: "+ highpar)
+    print("writing: "+ str(highpar))
     write_new_participants(lines, highpar)
 print("----------------------------------------")
