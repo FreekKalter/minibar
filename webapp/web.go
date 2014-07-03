@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -14,13 +16,29 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type tuple struct {
+	Name  string
+	Value int64
+}
+
+type TupleList []tuple
+
+func (t TupleList) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
+func (t TupleList) Len() int      { return len(t) }
+func (t TupleList) Less(i, j int) bool {
+	a, _ := strconv.ParseInt(strings.Split(t[i].Name, "-")[0], 10, 32)
+	b, _ := strconv.ParseInt(strings.Split(t[j].Name, "-")[0], 10, 32)
+	return a < b
+}
+
 func main() {
 	local := flag.Bool("local", false, "start on port 5000 for local 80 for public")
 	flag.Parse()
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "index.html") })
 	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
-	r.HandleFunc("/grolsch/{format}", grolsch)
+	r.HandleFunc("/grolsch/heatmap", grolsch_heatmap)
+	r.HandleFunc("/grolsch/bars/{day:[0-9]}", grolsch_bars)
 	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 	http.Handle("/", r)
@@ -35,9 +53,8 @@ func main() {
 	}
 }
 
-func grolsch(w http.ResponseWriter, r *http.Request) {
+func grolsch_heatmap(w http.ResponseWriter, r *http.Request) {
 
-	formVars := mux.Vars(r)
 	f, err := os.Open("../out.log")
 	if err != nil {
 		panic(err)
@@ -55,43 +72,53 @@ func grolsch(w http.ResponseWriter, r *http.Request) {
 		stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
 	}
 
-	stage2 := make([]map[string]interface{}, 0)
-	if formVars["format"] == "bars" {
-		for uur, weekdagen := range stage1 {
-			row := make(map[string]interface{})
-			//row["Uur"] = int64(uur)
-			if int(uur) == 0 {
-				row["Uur"] = "23-0"
+	w.Write([]byte("day\thour\tvalue\n"))
+	DayOrder := []int{1, 2, 3, 4, 5, 6, 0}
+	for _, dag := range DayOrder {
+		for uur := 0; uur < 24; uur++ {
+			if dag == 0 {
+				w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", 7, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
 			} else {
-				row["Uur"] = fmt.Sprintf("%d-%d", uur-1, uur)
-			}
-
-			for dag, nrs := range weekdagen {
-				row[dag] = avg(nrs)
-			}
-			stage2 = append(stage2, row)
-		}
-		jsonEncoder := json.NewEncoder(w)
-		jsonEncoder.Encode(stage2)
-
-	} else {
-		w.Write([]byte("day\thour\tvalue\n"))
-		DayOrder := []int{1, 2, 3, 4, 5, 6, 0}
-		for _, dag := range DayOrder {
-			for uur := 0; uur < 24; uur++ {
-				if dag == 0 {
-					w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", 7, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
-				} else {
-					w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", dag, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
-				}
-
+				w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", dag, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
 			}
 
 		}
+
 	}
-
 }
 
+func grolsch_bars(w http.ResponseWriter, r *http.Request) {
+	formVars := mux.Vars(r)
+	valid_integer_regex := regexp.MustCompile("^[0-9]{1,3}$")
+	if !valid_integer_regex.MatchString(strings.TrimSpace(formVars["day"])) {
+		return
+	}
+	dayNr, _ := strconv.ParseInt(formVars["day"], 10, 32) //base 10, 32bit integer
+	fmt.Println("dayNr", dayNr)
+	f, err := os.Open("../out.log")
+	if err != nil {
+		panic(err)
+	}
+	avgMap := make(map[string][]int64)
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		// parse time
+		t, nr := parse_line(scanner.Text())
+		t2 := t.Add(-time.Hour)
+		if t.Weekday() == time.Weekday(dayNr) {
+			name := fmt.Sprintf("%d-%d", t2.Hour(), t.Hour())
+			avgMap[name] = append(avgMap[name], nr)
+		}
+	}
+	list := make(TupleList, 0)
+	for k, v := range avgMap {
+		list = append(list, tuple{Name: k, Value: avg(v)})
+	}
+	sort.Sort(list)
+	jsonEncoder := json.NewEncoder(w)
+	jsonEncoder.Encode(list)
+
+}
 func parse_line(line string) (t time.Time, nr int64) {
 	tmp := strings.Split(line, "|")
 	var err error
