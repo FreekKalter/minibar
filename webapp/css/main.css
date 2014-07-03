@@ -31,3 +31,7 @@ text.axis-worktime {
 .chart-container{
     display: block;
 }
+
+text.dayLabel{
+    stroke: black;
+}
