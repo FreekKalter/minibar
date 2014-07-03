@@ -94,7 +94,6 @@ func grolsch_bars(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dayNr, _ := strconv.ParseInt(formVars["day"], 10, 32) //base 10, 32bit integer
-	fmt.Println("dayNr", dayNr)
 	f, err := os.Open("../out.log")
 	if err != nil {
 		panic(err)

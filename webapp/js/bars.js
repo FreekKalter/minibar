@@ -59,20 +59,30 @@ function plotBars(day){
           .text("Aantal codes ingevoerd");
 
 
-        var bar = bars_svg.selectAll(".bar")
+        var bars = bars_svg.selectAll(".bar")
           .data(data)
-        .enter().append("rect")
+        .enter().append("g");
+        var barRects = bars.append("rect")
           .attr("class", "bar")
           .attr("x", function(d) { return bars_x(d.Name); })
-          .attr("y", function(d) { return bars_y(d.Value); })
-          .attr("height", function(d) { return bars_height - bars_y(d.Value); })
+          .attr("y", function(d) { return bars_y(0); })
+          .attr("height", 0)
           .attr("width", bars_x.rangeBand());
 
-        bar.append("text")
-            .attr("x", function(d) { return bars_x(d.Value) ; })
+
+        barRects.transition().duration(1000)
+          .attr("height", function(d) { return bars_height - bars_y(d.Value); })
+          .attr("y", function(d) { return bars_y(d.Value); });
+        //.style("fill", function(d) { return colorScale(d.value);  });
+
+        bars.append("text")
+            .attr("x", function(d) { return bars_x(d.Name) ; })
             .attr("y", function(d) { return bars_y(d.Value); })
-            //.attr("dy", "5em")
-            .text(function(d) { return d.Value; });
+            .attr("dy", "1em")
+            .attr("dx", ".3em")
+            .text(function(d) { return d.Value; })
+            .attr("class", "barLabel");
+
 
     }
     httpRequest.open('GET', "grolsch/bars/"+day);

@@ -39,3 +39,7 @@ text.dayLabel{
 rect.bar{
     fill: #166711;
 }
+
+text.barLabel{
+    fill: #FFF;
+}
