@@ -1,11 +1,22 @@
+/*body{*/
+/*[>font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;<]*/
+/*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
+/*}*/
+
+text{
+    /*font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;*/
+    /*font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans serif;*/
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+}
+
 .chart rect {
-  fill: steelblue;
+    fill: steelblue;
 }
 
 .chart text {
-  fill: white;
-  font: 10px sans-serif;
-  text-anchor: end;
+    fill: white;
+    font: 10px sans-serif;
+    text-anchor: end;
 }
 
 rect.bordered {
@@ -16,7 +27,7 @@ rect.bordered {
 
 text.mono {
     font-size: 9pt;
-    font-family: Consolas, courier;
+    /*font-family: Consolas, courier;*/
     /*fill: #aaa;*/
 }
 
