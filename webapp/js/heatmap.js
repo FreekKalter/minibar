@@ -88,4 +88,5 @@ $(function() {
         .attr("x", function(d, i) { return legendElementWidth * i;  })
         .attr("y", height + gridSize);
     });
+    plotBars(0);
 });
