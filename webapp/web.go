@@ -38,25 +38,25 @@ func main() {
 func grolsch(w http.ResponseWriter, r *http.Request) {
 
 	formVars := mux.Vars(r)
+	f, err := os.Open("../out.log")
+	if err != nil {
+		panic(err)
+	}
+
+	//			  [uur] [ weekag ][ aantal_codes[] ]
+	stage1 := make([]map[string][]int64, 24)
+	for i := 0; i < 24; i++ {
+		stage1[i] = make(map[string][]int64)
+	}
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		// parse time
+		t, nr := parse_line(scanner.Text())
+		stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
+	}
+
+	stage2 := make([]map[string]interface{}, 0)
 	if formVars["format"] == "bars" {
-		f, err := os.Open("../out.log")
-		if err != nil {
-			panic(err)
-		}
-
-		//			  [uur] [ weekag ][ aantal_codes[] ]
-		stage1 := make([]map[string][]int64, 24)
-		for i := 0; i < 24; i++ {
-			stage1[i] = make(map[string][]int64)
-		}
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-			// parse time
-			t, nr := parse_line(scanner.Text())
-			stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
-		}
-
-		stage2 := make([]map[string]interface{}, 0)
 		for uur, weekdagen := range stage1 {
 			row := make(map[string]interface{})
 			//row["Uur"] = int64(uur)
@@ -71,13 +71,25 @@ func grolsch(w http.ResponseWriter, r *http.Request) {
 			}
 			stage2 = append(stage2, row)
 		}
-
 		jsonEncoder := json.NewEncoder(w)
 		jsonEncoder.Encode(stage2)
 
 	} else {
+		w.Write([]byte("day\thour\tvalue\n"))
+		DayOrder := []int{1, 2, 3, 4, 5, 6, 0}
+		for _, dag := range DayOrder {
+			for uur := 0; uur < 24; uur++ {
+				if dag == 0 {
+					w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", 7, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
+				} else {
+					w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", dag, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
+				}
 
+			}
+
+		}
 	}
+
 }
 
 func parse_line(line string) (t time.Time, nr int64) {

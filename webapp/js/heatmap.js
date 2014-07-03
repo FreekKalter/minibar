@@ -1,33 +1,34 @@
-var margin = { top: 50, right: 0, bottom: 100, left: 30  },
-    width = 960 - margin.left - margin.right,
-    height = 430 - margin.top - margin.bottom,
+var heatmap_margin = { top: 50, right: 0, bottom: 100, left: 30  },
+    width = 960 - heatmap_margin.left - heatmap_margin.right,
+    height = 430 - heatmap_margin.top - heatmap_margin.bottom,
     gridSize = Math.floor(width / 24),
     legendElementWidth = gridSize*2,
-    buckets = 9,
-    colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"], // alternatively colorbrewer.YlGnBu[9]
+    buckets = 7,
+    //colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"], // alternatively colorbrewer.YlGnBu[9]
+    colors =  ["#EEFE57", "#E8FE19", "#8DCF8A", "#5AAC56", "#328A2E", "#166711", "#034500", ],
     days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
     times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 
 
-var httpRequest = new XMLHttpRequest();
-httpRequest.onreadystatechange = function () {
-    var data = [];
-    if (httpRequest.readyState == 4 ) {
-        if(httpRequest.status == 200){
-            data = JSON.parse(httpRequest.responseText);
-        }
-    }
-
-
+ d3.tsv("grolsch/heatmap",
+        function(d) {
+          return {
+            day: +d.day,
+            hour: +d.hour,
+            value: +d.value
+          };
+        },
+        function(error, data) {
+            console.log(d3.min(data, function(d){return d.value;}));
     var colorScale = d3.scale.quantile()
-        .domain([0, buckets - 1, d3.max(data, function (d) { return d.value;  })])
+        .domain(data.map(function(k){ return k.value}))
         .range(colors);
 
-    var svg = d3.select("#chart").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+    var svg = d3.select("#heatmap")
+        .attr("width", width + heatmap_margin.left + heatmap_margin.right)
+        .attr("height", height + heatmap_margin.top + heatmap_margin.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + heatmap_margin.left + "," + heatmap_margin.top + ")");
 
     var dayLabels = svg.selectAll(".dayLabel")
         .data(days)
@@ -83,13 +84,9 @@ httpRequest.onreadystatechange = function () {
         .text(function(d) { return "≥ " + Math.round(d);  })
         .attr("x", function(d, i) { return legendElementWidth * i;  })
         .attr("y", height + gridSize);
+});
+
+function type(d) {
+    d.Value = +d.Value; // coerce to number
+    return d;
 }
-    httpRequest.open('GET', "data")
-httpRequest.send()
-
-
-
-    function type(d) {
-        d.Value = +d.Value; // coerce to number
-        return d;
-    }
