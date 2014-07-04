@@ -10,6 +10,7 @@
 
 ## midterm
 
+* get a info@domain working
 * place adds
 * promote the site
 
