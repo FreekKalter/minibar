@@ -23,12 +23,12 @@ var bars_svg = d3.select("#bar")
     .attr("transform", "translate(" + bars_margin.left + "," + bars_margin.top + ")");
 
 function plotBars(day){
-    var httpRequest = new XMLHttpRequest();
-    httpRequest.onreadystatechange = function () {
+    var bars_httpRequest = new XMLHttpRequest();
+    bars_httpRequest.onreadystatechange = function () {
         var data = [];
-        if (httpRequest.readyState == 4 ) {
-               if(httpRequest.status == 200){
-                   data = JSON.parse(httpRequest.responseText);
+        if (bars_httpRequest.readyState == 4 ) {
+               if(bars_httpRequest.status == 200){
+                   data = JSON.parse(bars_httpRequest.responseText);
                }
         }
         bars_svg.selectAll("*").remove();
@@ -79,14 +79,14 @@ function plotBars(day){
             .attr("x", function(d) { return bars_x(d.Name) ; })
             .attr("y", function(d) { return bars_y(d.Value); })
             .attr("dy", "1em")
-            .attr("dx", ".3em")
+            .attr("dx", ".2em")
             .text(function(d) { return d.Value; })
             .attr("class", "barLabel");
 
 
     }
-    httpRequest.open('GET', "grolsch/bars/"+day);
-    httpRequest.send();
+    bars_httpRequest.open('GET', "grolsch/bars/"+day);
+    bars_httpRequest.send();
 }
     function type(d) {
       d.Value = +d.Value; // coerce to number
