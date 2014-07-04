@@ -31,16 +31,25 @@ func (t TupleList) Less(i, j int) bool {
 	return a < b
 }
 
+type Config struct {
+	BrandLog map[string]string
+}
+
+var config Config
+
 func main() {
 	local := flag.Bool("local", false, "start on port 5000 for local 80 for public")
 	flag.Parse()
+	config.BrandLog = map[string]string{"grolsch": "out.log"}
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "index.html") })
 	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
-	r.HandleFunc("/grolsch/heatmap", grolsch_heatmap)
-	r.HandleFunc("/grolsch/bars/{day:[0-9]}", grolsch_bars)
 	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
+
+	r.HandleFunc("/{brand}/{method}", dataHandler)
+	r.HandleFunc("/{brand}/{method}/{day:[0-9]}", dataHandler)
 	http.Handle("/", r)
 	var err error
 	if *local {
@@ -53,71 +62,75 @@ func main() {
 	}
 }
 
-func grolsch_heatmap(w http.ResponseWriter, r *http.Request) {
-
-	f, err := os.Open("../out.log")
-	if err != nil {
-		panic(err)
+func dataHandler(w http.ResponseWriter, r *http.Request) {
+	formVars := mux.Vars(r)
+	var f *os.File
+	var err error
+	if filename, ok := config.BrandLog[formVars["brand"]]; !ok {
+		http.Error(w, "Onbekend merk", 404)
+		return
+	} else {
+		f, err = os.Open("../" + filename)
+		if err != nil {
+			panic(err)
+		}
 	}
+	if formVars["method"] == "heatmap" {
+		//			  [uur] [ weekag ][ aantal_codes[] ]
+		stage1 := make([]map[string][]int64, 24)
+		for i := 0; i < 24; i++ {
+			stage1[i] = make(map[string][]int64)
+		}
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			// parse time
+			t, nr := parse_line(scanner.Text())
+			stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
+		}
 
-	//			  [uur] [ weekag ][ aantal_codes[] ]
-	stage1 := make([]map[string][]int64, 24)
-	for i := 0; i < 24; i++ {
-		stage1[i] = make(map[string][]int64)
-	}
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		// parse time
-		t, nr := parse_line(scanner.Text())
-		stage1[t.Hour()][t.Weekday().String()] = append(stage1[t.Hour()][t.Weekday().String()], nr)
-	}
+		w.Write([]byte("day\thour\tvalue\n"))
+		DayOrder := []int{1, 2, 3, 4, 5, 6, 0}
+		for _, dag := range DayOrder {
+			for uur := 0; uur < 24; uur++ {
+				if dag == 0 {
+					w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", 7, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
+				} else {
+					w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", dag, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
+				}
 
-	w.Write([]byte("day\thour\tvalue\n"))
-	DayOrder := []int{1, 2, 3, 4, 5, 6, 0}
-	for _, dag := range DayOrder {
-		for uur := 0; uur < 24; uur++ {
-			if dag == 0 {
-				w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", 7, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
-			} else {
-				w.Write([]byte(fmt.Sprintf("%d\t%d\t%d\n", dag, uur+1, avg(stage1[uur][time.Weekday(dag).String()]))))
 			}
 
 		}
-
-	}
-}
-
-func grolsch_bars(w http.ResponseWriter, r *http.Request) {
-	formVars := mux.Vars(r)
-	valid_integer_regex := regexp.MustCompile("^[0-9]{1,3}$")
-	if !valid_integer_regex.MatchString(strings.TrimSpace(formVars["day"])) {
-		return
-	}
-	dayNr, _ := strconv.ParseInt(formVars["day"], 10, 32) //base 10, 32bit integer
-	f, err := os.Open("../out.log")
-	if err != nil {
-		panic(err)
-	}
-	avgMap := make(map[string][]int64)
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		// parse time
-		t, nr := parse_line(scanner.Text())
-		t2 := t.Add(-time.Hour)
-		if t.Weekday() == time.Weekday(dayNr) {
-			name := fmt.Sprintf("%d-%d", t2.Hour(), t.Hour())
-			avgMap[name] = append(avgMap[name], nr)
+	} else if formVars["method"] == "bars" {
+		valid_integer_regex := regexp.MustCompile("^[0-9]{1,3}$")
+		if !valid_integer_regex.MatchString(strings.TrimSpace(formVars["day"])) {
+			return
 		}
-	}
-	list := make(TupleList, 0)
-	for k, v := range avgMap {
-		list = append(list, tuple{Name: k, Value: avg(v)})
-	}
-	sort.Sort(list)
-	jsonEncoder := json.NewEncoder(w)
-	jsonEncoder.Encode(list)
+		dayNr, _ := strconv.ParseInt(formVars["day"], 10, 32) //base 10, 32bit integer
+		avgMap := make(map[string][]int64)
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			// parse time
+			t, nr := parse_line(scanner.Text())
+			t2 := t.Add(-time.Hour)
+			if t.Weekday() == time.Weekday(dayNr) {
+				name := fmt.Sprintf("%d-%d", t2.Hour(), t.Hour())
+				avgMap[name] = append(avgMap[name], nr)
+			}
+		}
+		list := make(TupleList, 0)
+		for k, v := range avgMap {
+			list = append(list, tuple{Name: k, Value: avg(v)})
+		}
+		sort.Sort(list)
+		jsonEncoder := json.NewEncoder(w)
+		jsonEncoder.Encode(list)
 
+	} else {
+		http.Error(w, "Dit adres is ongeldig", 404)
+	}
 }
+
 func parse_line(line string) (t time.Time, nr int64) {
 	tmp := strings.Split(line, "|")
 	var err error
