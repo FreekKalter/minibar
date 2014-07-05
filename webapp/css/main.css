@@ -3,6 +3,11 @@
 /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
 /*}*/
 
+body{
+    font-size: 17px;
+    font-family: sans-serif;
+}
+
 text{
     /*font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;*/
     /*font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans serif;*/
@@ -54,6 +59,7 @@ rect.bar{
 text.barLabel{
     fill: #FFF;
 }
+
 rect.active-day{
     stroke: #AAA;
     stroke-width:2px;
