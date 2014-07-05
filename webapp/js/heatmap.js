@@ -10,16 +10,17 @@ var heatmap_margin = { top: 50, right: 0, bottom: 100, left: 30  },
     times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 
 
-var heat_httpRequest = new XMLHttpRequest();
-heat_httpRequest.onreadystatechange = function () {
-var data = [];
-if (heat_httpRequest.readyState == 4 ) {
-       if(heat_httpRequest.status == 200){
-           data = JSON.parse(heat_httpRequest.responseText);
-       }
-}
+ d3.tsv("grolsch/heatmap",
+function(d) {
+  return {
+    day: +d.day,
+    hour: +d.hour,
+    value: +d.value
+  };
+},
+function(error, data) {
 var colorScale = d3.scale.quantile()
-    .domain(data.map(function(k){ return k.value; }))
+    .domain(data.map(function(k){ return k.value}))
     .range(colors);
 
 var svg = d3.select("#heatmap")
@@ -51,9 +52,8 @@ var timeLabels = svg.selectAll(".timeLabel")
     .attr("class", "timeLabel mono axis axis-worktime");
 
 var heatMap = svg.selectAll(".hour")
-    .append("g")
-    .attr("class","day")
-    .append("rect")
+    .data(data)
+    .enter().append("rect")
     .attr("x", function(d) { return (d.hour - 1) * gridSize;  })
     .attr("y", function(d) { return (d.day - 1) * gridSize;  })
     .attr("rx", 4)
@@ -85,7 +85,5 @@ legend.append("text")
     .text(function(d) { return "≥ " + Math.round(d);  })
     .attr("x", function(d, i) { return legendElementWidth * i;  })
     .attr("y", height + gridSize);
-}
-heat_httpRequest.open('GET', "grolsch/heatmap");
-heat_httpRequest.send();
+});
 plotBars(0);
