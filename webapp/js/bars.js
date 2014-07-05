@@ -88,7 +88,7 @@ function plotBars(day){
     bars_httpRequest.open('GET', "grolsch/bars/"+day);
     bars_httpRequest.send();
 }
-    function type(d) {
-      d.Value = +d.Value; // coerce to number
-      return d;
-    }
+function type(d) {
+  d.Value = +d.Value; // coerce to number
+  return d;
+}

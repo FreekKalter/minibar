@@ -32,7 +32,7 @@ var dayLabels = svg.selectAll(".dayLabel")
     .data(days)
     .enter().append("a")
     .append("text")
-    .on("click", function(d,i){plotBars(i);})
+    .on("click", function(d,i){plotBars(i);makeDayActive(i+1);})
     .text(function (d) { return d;  })
     .attr("x", 0)
     .attr("y", function (d, i) { return i * gridSize;  })
@@ -54,12 +54,12 @@ var heatMap = svg.selectAll(".hour")
     .data(data)
     .enter().append("a")
     .append("rect")
-    .on("click", function(d,i){plotBars(Math.round(i/24));})
+    .on("click", function(d,i){plotBars(Math.round(i/24)); makeDayActive(Math.round((i+12)/24));})
     .attr("x", function(d) { return (d.hour - 1) * gridSize;  })
     .attr("y", function(d) { return (d.day - 1) * gridSize;  })
     .attr("rx", 4)
     .attr("ry", 4)
-    .attr("class", "hour bordered")
+    .attr("class", function(d,i){ return "hour bordered day-" +Math.round((i+12)/24); })
     .attr("width", gridSize)
     .attr("height", gridSize)
     .style("fill", colors[0]);
@@ -88,3 +88,14 @@ legend.append("text")
     .attr("y", height + gridSize);
 });
 plotBars(0);
+
+function makeDayActive(day){
+    // reset all rows
+   d3.selectAll(".hour")
+       .classed("active-day", false);
+
+   // make active row active
+   d3.selectAll(".day-"+day)
+       .classed("active-day", true);
+}
+

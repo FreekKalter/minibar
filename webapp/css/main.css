@@ -54,3 +54,7 @@ rect.bar{
 text.barLabel{
     fill: #FFF;
 }
+rect.active-day{
+    stroke: #AAA;
+    stroke-width:2px;
+}
