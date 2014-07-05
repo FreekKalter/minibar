@@ -9,7 +9,6 @@ var heatmap_margin = { top: 50, right: 0, bottom: 100, left: 30  },
     days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
     times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 
-
  d3.tsv("grolsch/heatmap",
 function(d) {
   return {
@@ -32,8 +31,8 @@ var svg = d3.select("#heatmap")
 var dayLabels = svg.selectAll(".dayLabel")
     .data(days)
     .enter().append("a")
-    .attr("xlink:href", "#").append("text")
-    .on("click", function(d,e){plotBars(e);})
+    .append("text")
+    .on("click", function(d,i){plotBars(i);})
     .text(function (d) { return d;  })
     .attr("x", 0)
     .attr("y", function (d, i) { return i * gridSize;  })
@@ -53,7 +52,9 @@ var timeLabels = svg.selectAll(".timeLabel")
 
 var heatMap = svg.selectAll(".hour")
     .data(data)
-    .enter().append("rect")
+    .enter().append("a")
+    .append("rect")
+    .on("click", function(d,i){plotBars(Math.round(i/24));})
     .attr("x", function(d) { return (d.hour - 1) * gridSize;  })
     .attr("y", function(d) { return (d.day - 1) * gridSize;  })
     .attr("rx", 4)
