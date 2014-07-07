@@ -12,29 +12,38 @@
             <div id="jumbo" class="jumbotron">
                 <h1>WanneerKanIkWinnen.nl</h1>
                 <p> Welkom op wanneerkanikwinnen.nl! Je kent die acties wel waarbij een bedrijf elk uur
-                een prijs verloot onder klanten die dat uur een actie code invoeren. Grolsch heeft zo'n actie
+                een prijs verloot. Je moet dan vaak een code invoeren die je bij dat product krijgt. Grolsch heeft zo'n actie
                 (vaak tijdens het wk/ek) waarbij ze elk uur een minibar weggeven.
                 Als je zo'n actie code hebt wil je deze natuurlijk invoeren op het moment dat je de meeste kans maakt.
-                Oftewel wanneer er zo min mogelijk mensen hun code invoeren. Op deze site kun je precies zien wanneer
+                In andere woorden, wanneer er zo min mogelijk mensen hun code invoeren. Op deze site kun je precies zien wanneer
                 jij de meeste kans maakt!
                 </p>
             </div>
 
-            <p>Op onderstaande heatmap zie je in 1 oogopslag welke tijden populair zijn, deze vakjes zijn donker
-            groen gekleurd. De uren dat er weinig mensen hun code invoeren zijn geel.
-            </p>
 
-            <div class="chart-container">
-                <svg id="heatmap"></svg>
-            </div>
-            <p>
-            Onderstaande grafiek geeft een gedaileerde weergave van een dag. Klik in de bovenstaande heatmap op
-            een dag om de gedaileerde grafiek van die dag te laten zien.
-            </p>
-            <div class="chart-container">
-                <svg id="bar"></svg>
+            <div class="chart-container panel panel-default">
+                <div class="panel-heading">
+                        <p>Op onderstaande heatmap zie je in 1 oogopslag welke tijden populair zijn, deze vakjes zijn donker
+                        groen gekleurd. De uren dat er weinig mensen hun code invoeren zijn geel.</br>
+                    De grafiek daaronder geeft een gedetaileerde weergave van een dag. Klik in de heatmap op
+                    een dag om de gedetaileerde grafiek van die dag te laten zien.
+                    </p>
+                </div>
+                <div class="panel-body">
+                    <svg id="heatmap"></svg>
+                </div>
+                <div class="chart-container">
+                    <svg id="bar"></svg>
+                </div>
             </div>
         </div>
+        <div id="footer">
+            <div class="container">
+                <hr>
+                <p class="text-center">Gemaakt door <a href="http://kalteronline.org">Freek Kalter</a></p>
+            </div>
+        </div> <!--footer-->
+
         <script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"></script>
         <script src="js/bars.js"></script>
         <script src="js/heatmap.js"></script>

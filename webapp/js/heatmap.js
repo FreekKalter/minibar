@@ -54,7 +54,11 @@ var heatMap = svg.selectAll(".hour")
     .data(data)
     .enter().append("a")
     .append("rect")
-    .on("click", function(d,i){plotBars(Math.round(i/24)); makeDayActive(Math.round((i+12)/24));})
+    .on("click", function(d,i){
+        today = Math.round((i+12)/24);
+        console.log(today);
+        plotBars(today);
+        makeDayActive(today);})
     .attr("x", function(d) { return (d.hour - 1) * gridSize;  })
     .attr("y", function(d) { return (d.day - 1) * gridSize;  })
     .attr("rx", 4)
@@ -87,9 +91,12 @@ legend.append("text")
     .attr("x", function(d, i) { return legendElementWidth * i;  })
     .attr("y", height + gridSize);
 });
-plotBars(0);
+today = new Date().getDay();
+plotBars(today);
+makeDayActive(today +1);
 
 function makeDayActive(day){
+    console.log("called with: "+ day);
     // reset all rows
    d3.selectAll(".hour")
        .classed("active-day", false);

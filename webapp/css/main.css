@@ -14,6 +14,11 @@ text{
     font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 }
 
+.jumbotron h1{
+    font-size: 60px;
+    font-style: italic;
+}
+
 .chart rect {
     fill: steelblue;
 }
@@ -64,4 +69,8 @@ text.barLabel{
 rect.active-day{
     stroke: #AAA;
     stroke-width:2px;
+}
+
+.panel-heading p{
+   font-weight: 200;
 }
