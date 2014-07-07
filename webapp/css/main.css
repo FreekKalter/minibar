@@ -58,6 +58,7 @@ rect.bar{
 
 text.barLabel{
     fill: #FFF;
+    font-size: .7em;
 }
 
 rect.active-day{

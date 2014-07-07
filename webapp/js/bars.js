@@ -1,4 +1,4 @@
-var bars_margin = {top: 20, right: 30, bottom: 60, left: 40},
+var bars_margin = {top: 20, right: 30, bottom: 60, left: 50},
     bars_width = 960 - bars_margin.left - bars_margin.right,
     bars_height = 600 - bars_margin.top - bars_margin.bottom;
 
@@ -87,8 +87,4 @@ function plotBars(day){
     }
     bars_httpRequest.open('GET', "grolsch/bars/"+day);
     bars_httpRequest.send();
-}
-function type(d) {
-  d.Value = +d.Value; // coerce to number
-  return d;
 }
