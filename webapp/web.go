@@ -106,6 +106,7 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 		if !valid_integer_regex.MatchString(strings.TrimSpace(formVars["day"])) {
 			return
 		}
+		DayOrder := []int{1, 2, 3, 4, 5, 6, 0}
 		dayNr, _ := strconv.ParseInt(formVars["day"], 10, 32) //base 10, 32bit integer
 		avgMap := make(map[string][]int64)
 		scanner := bufio.NewScanner(f)
@@ -113,7 +114,7 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 			// parse time
 			t, nr := parse_line(scanner.Text())
 			t2 := t.Add(-time.Hour)
-			if t.Weekday() == time.Weekday(dayNr) {
+			if t.Weekday() == time.Weekday(DayOrder[dayNr]) {
 				name := fmt.Sprintf("%d-%d", t2.Hour(), t.Hour())
 				avgMap[name] = append(avgMap[name], nr)
 			}

@@ -57,7 +57,7 @@ var heatMap = svg.selectAll(".hour")
     .on("click", function(d,i){
         today = Math.round((i+12)/24);
         console.log(today);
-        plotBars(today);
+        plotBars(today-1);
         makeDayActive(today);})
     .attr("x", function(d) { return (d.hour - 1) * gridSize;  })
     .attr("y", function(d) { return (d.day - 1) * gridSize;  })
@@ -90,10 +90,11 @@ legend.append("text")
     .text(function(d) { return "≥ " + Math.round(d);  })
     .attr("x", function(d, i) { return legendElementWidth * i;  })
     .attr("y", height + gridSize);
+
+    today = new Date().getDay();
+    plotBars(today-1);
+    makeDayActive(today);
 });
-today = new Date().getDay();
-plotBars(today);
-makeDayActive(today +1);
 
 function makeDayActive(day){
     console.log("called with: "+ day);
