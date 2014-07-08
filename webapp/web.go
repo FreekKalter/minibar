@@ -53,6 +53,7 @@ func main() {
 	http.Handle("/", r)
 	var err error
 	if *local {
+		fmt.Println("listening on port 5000")
 		err = http.ListenAndServe(":5000", r)
 	} else {
 		err = http.ListenAndServe(":80", r)
