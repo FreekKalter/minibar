@@ -1,5 +1,7 @@
 ## shortterm
 
+* modify fabfile for container deployment
+    - make minibar.py save to a logdir wich will be loaded by the wkiw container
 * better highlight of active day
 * 404 page styling
 * make a landing page to specific brand
