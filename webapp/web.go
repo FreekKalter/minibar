@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"flag"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/fcgi"
@@ -34,16 +34,24 @@ func (t TupleList) Less(i, j int) bool {
 }
 
 type Config struct {
-	BrandLog map[string]string
+	BrandList    map[string]string
+	Port, Method string
+	Logdir       string
 }
 
 var config Config
 
 func main() {
-	local := flag.Bool("local", false, "start on port 5000 for local 80 for public")
-	fastCgi := flag.Bool("fcgi", false, "start app with fastcgi on port 5000")
-	flag.Parse()
-	config.BrandLog = map[string]string{"grolsch": "out.log"}
+	var err error
+	configFile, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(configFile, &config)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(config.BrandList["grolsch"])
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "index.html") })
@@ -54,18 +62,17 @@ func main() {
 	r.HandleFunc("/{brand}/{method}", dataHandler)
 	r.HandleFunc("/{brand}/{method}/{day:[0-9]}", dataHandler)
 	http.Handle("/", r)
-	var err error
-	listener, err := net.Listen("tcp", ":5000")
+	listener, err := net.Listen("tcp", config.Port)
 	if err != nil {
 		panic(err)
 	}
-	if *local {
-		fmt.Println("listening for http on port 5000")
+	if config.Method == "local" {
+		fmt.Println("listening for http on port " + config.Port)
 		err = http.Serve(listener, nil)
-	} else if *fastCgi {
-		fmt.Println("listening for fast cgi on port 5000")
+	} else if config.Method == "fcgi" {
+		fmt.Println("listening for http on port " + config.Port)
 		err = fcgi.Serve(listener, nil)
-	} else {
+	} else if config.Method == "webserver" {
 		err = http.ListenAndServe(":80", r)
 	}
 	if err != nil {
@@ -77,11 +84,11 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 	formVars := mux.Vars(r)
 	var f *os.File
 	var err error
-	if filename, ok := config.BrandLog[formVars["brand"]]; !ok {
+	if filename, ok := config.BrandList[formVars["brand"]]; !ok {
 		http.Error(w, "Onbekend merk", 404)
 		return
 	} else {
-		f, err = os.Open("../" + filename)
+		f, err = os.Open(config.Logdir + "/" + filename)
 		if err != nil {
 			panic(err)
 		}

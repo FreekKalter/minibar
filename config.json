@@ -1,0 +1,9 @@
+{
+    "BrandList": {
+        "grolsch": "out.log",
+        "amstel": "amstel.log"
+    },
+    "Logdir": "/logdir",
+    "Port": ":5000",
+    "Method": "fcgi"
+}
