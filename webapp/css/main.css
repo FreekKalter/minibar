@@ -1,28 +1,80 @@
-.chart rect {
-  fill: #42833d;
-}
-.axis text {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  /*display: none;*/
-}
-
-.bar:hover{
-    fill: #13572e;
-}
-
-/*.chart text {*/
-  /*fill: white;*/
-  /*font: 10px sans-serif;*/
-  /*text-anchor: middle;*/
+/*body{*/
+/*[>font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;<]*/
+/*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
 /*}*/
 
+body{
+    font-size: 17px;
+    font-family: sans-serif;
+}
+
+text{
+    /*font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;*/
+    /*font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans serif;*/
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+}
+
+.jumbotron h1{
+    font-size: 60px;
+    font-style: italic;
+}
+
+.chart rect {
+    fill: steelblue;
+}
+
+.chart text {
+    fill: white;
+    font: 10px sans-serif;
+    text-anchor: end;
+}
+
+rect.bordered {
+    stroke: #E6E6E6;
+    stroke-width:2px;
+
+}
+
+text.mono {
+    font-size: 9pt;
+    /*font-family: Consolas, courier;*/
+    /*fill: #aaa;*/
+}
+
+text.axis-workweek {
+    fill: #000;
+}
+
+text.axis-worktime {
+    fill: #000;
+}
+
+.chart-container{
+    display: block;
+}
+
+text.dayLabel{
+    stroke: black;
+}
+
+rect.bar{
+    fill: #166711;
+}
+
+text.barLabel{
+    fill: #FFF;
+    font-size: .7em;
+}
+/*rect.hour{*/
+   /*opacity: 0.7;*/
+/*}*/
+
+rect.active-day{
+    /*opacity: 1.0;*/
+    stroke: #AAA;
+    stroke-width:2px;
+}
+
+.panel-heading p{
+   font-weight: 200;
+}
