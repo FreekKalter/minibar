@@ -73,6 +73,7 @@ heatMap.transition().duration(1000)
 
 heatMap.append("title").text(function(d) { return d.value;  });
 
+// legend
 var legend = svg.selectAll(".legend")
     .data([0].concat(colorScale.quantiles()), function(d) { return d;  })
     .enter().append("g")
@@ -91,9 +92,10 @@ legend.append("text")
     .attr("x", function(d, i) { return legendElementWidth * i;  })
     .attr("y", height + gridSize);
 
-    today = new Date().getDay();
-    plotBars(today-1);
-    makeDayActive(today);
+// plot current day and make ik active in heatmap
+today = new Date().getDay();
+plotBars(today-1);
+makeDayActive(today);
 });
 
 function makeDayActive(day){
@@ -102,7 +104,7 @@ function makeDayActive(day){
    d3.selectAll(".hour")
        .classed("active-day", false);
 
-   // make active row active
+   // give active row the active-day class
    d3.selectAll(".day-"+day)
        .classed("active-day", true);
 }

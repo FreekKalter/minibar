@@ -65,8 +65,12 @@ text.barLabel{
     fill: #FFF;
     font-size: .7em;
 }
+/*rect.hour{*/
+   /*opacity: 0.7;*/
+/*}*/
 
 rect.active-day{
+    /*opacity: 1.0;*/
     stroke: #AAA;
     stroke-width:2px;
 }
