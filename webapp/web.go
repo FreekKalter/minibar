@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
+	"net/http/fcgi"
 	"os"
 	"regexp"
 	"sort"
@@ -39,6 +41,7 @@ var config Config
 
 func main() {
 	local := flag.Bool("local", false, "start on port 5000 for local 80 for public")
+	fastCgi := flag.Bool("fcgi", false, "start app with fastcgi on port 5000")
 	flag.Parse()
 	config.BrandLog = map[string]string{"grolsch": "out.log"}
 
@@ -52,9 +55,16 @@ func main() {
 	r.HandleFunc("/{brand}/{method}/{day:[0-9]}", dataHandler)
 	http.Handle("/", r)
 	var err error
+	listener, err := net.Listen("tcp", ":5000")
+	if err != nil {
+		panic(err)
+	}
 	if *local {
-		fmt.Println("listening on port 5000")
-		err = http.ListenAndServe(":5000", r)
+		fmt.Println("listening for http on port 5000")
+		err = http.Serve(listener, nil)
+	} else if *fastCgi {
+		fmt.Println("listening for fast cgi on port 5000")
+		err = fcgi.Serve(listener, nil)
 	} else {
 		err = http.ListenAndServe(":80", r)
 	}
