@@ -12,6 +12,8 @@
 
 ## midterm
 
+* compress static shit
+* add expire headers (via nginx?)
 * get a info@domain working
 * place adds
 
