@@ -40,8 +40,9 @@ def container_deploy():
     with settings(hide('warnings'), warn_only=True):
         run('docker run -d -t -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock \
                 --name=nginx_proxy jwilder/nginx-proxy')
-        run('docker kill wkik_nl')
+        run('docker kill wkiw-app')
+        run('docker rm wkiw-app')
 
     run('docker run -d -e VIRTUAL_HOST=wanneerkanikwinnen.nl -v /home/fkalter/minibar-deploy:/logdir\
-            --name=wkik_nl freekkalter/wkiw-app')
+            --name=wkiw-app freekkalter/wkiw-app')
 
