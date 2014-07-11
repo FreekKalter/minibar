@@ -1,20 +1,18 @@
 ## shortterm
 
-* modify fabfile for container deployment
-    - make minibar.py save to a logdir wich will be loaded by the wkiw container
+* compress static shit (use makefile from km app)
 * better highlight of active day
-* 404 page styling
-* make a landing page to specific brand
-    * add more brands
+* add expire headers (via nginx?)
 * security check, sanityze all points of input
-* write a introduction for the whole site
-    * and per brand, what the promotion is, link to the site
+* 404 page styling
+* make a landing page with links to specific actions
+    * add more actions
 
 ## midterm
 
-* compress static shit
-* add expire headers (via nginx?)
-* get a info@domain working
+* write a *better* introduction for the whole site
+    * and per brand, what the promotion is, link to the site
+* get a info@domain working, practicly a whole mailserver
 * place adds
 
 ## longterm

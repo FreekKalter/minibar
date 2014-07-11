@@ -36,7 +36,7 @@ def container_deploy():
 
     run('docker pull freekkalter/wkiw-app')
 
-    # run nginx-proy, dont panic if it is already running
+    # do some shit that may fail, but only fails cause its already done
     with settings(hide('warnings'), warn_only=True):
         run('docker run -d -t -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock \
                 --name=nginx_proxy jwilder/nginx-proxy')
