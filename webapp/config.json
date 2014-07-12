@@ -6,5 +6,5 @@
     "Logdir": "..",
     "Port": ":5000",
     "Method": "local",
-    "Env": "production"
+    "Env": "testing"
 }

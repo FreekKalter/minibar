@@ -42,6 +42,7 @@ type Config struct {
 }
 
 var config Config
+var templates *template.Template
 
 func main() {
 	var err error
@@ -54,13 +55,14 @@ func main() {
 		panic(err)
 	}
 
+	templates = template.Must(template.ParseFiles("index.html"))
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
-
 	if config.Env == "testing" {
-		r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
+		r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "static/favicon.ico") })
+		r.PathPrefix("/static/css/").Handler(http.StripPrefix("/static/css/", http.FileServer(http.Dir("static/css/"))))
+		r.PathPrefix("/static/js/").Handler(http.StripPrefix("/static/js/", http.FileServer(http.Dir("static/js/"))))
 	}
 
 	r.HandleFunc("/{brand}/{method}", dataHandler)
@@ -84,14 +86,7 @@ func main() {
 	}
 }
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	//fmt.Fprint(w, "<b>Hello</b>")
-	t, err := template.ParseFiles("index.html")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(config)
-	err = t.Execute(w, config)
-	if err != nil {
+	if err := templates.Execute(w, config); err != nil {
 		panic(err)
 	}
 }
