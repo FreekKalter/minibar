@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -37,6 +38,7 @@ type Config struct {
 	BrandList    map[string]string
 	Port, Method string
 	Logdir       string
+	Env          string
 }
 
 var config Config
@@ -51,13 +53,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(config.BrandList["grolsch"])
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "index.html") })
-	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
-	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
-	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
+	r.HandleFunc("/", homeHandler)
+
+	if config.Env == "testing" {
+		r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "favicon.ico") })
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
+	}
 
 	r.HandleFunc("/{brand}/{method}", dataHandler)
 	r.HandleFunc("/{brand}/{method}/{day:[0-9]}", dataHandler)
@@ -75,6 +79,18 @@ func main() {
 	} else if config.Method == "webserver" {
 		err = http.ListenAndServe(":80", r)
 	}
+	if err != nil {
+		panic(err)
+	}
+}
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	//fmt.Fprint(w, "<b>Hello</b>")
+	t, err := template.ParseFiles("index.html")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(config)
+	err = t.Execute(w, config)
 	if err != nil {
 		panic(err)
 	}

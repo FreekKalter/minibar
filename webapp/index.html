@@ -1,11 +1,14 @@
-<!DOCTYPE xhtml>
 <html lang="en" >
     <head>
         <meta charset="utf-8">
         <title>Grolsch wk actie</title>
         <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-        <link href="static/css/main.css" rel="stylesheet" media="screen">
+        {{if eq .Env "testing"}}
+            <link href="static/css/main.css" rel="stylesheet" media="screen">
+        {{else}}
+            <link href="static/css/main.min.css" rel="stylesheet" media="screen">
+        {{end}}
     </head>
     <body>
         <div id="container" class="container">
@@ -29,12 +32,12 @@
                     een dag om de gedetaileerde grafiek van die dag te laten zien.
                     </p>
                 </div>
-                <div class="panel-body">
-                    <svg id="heatmap"></svg>
-                </div>
-                <div class="chart-container">
-                    <svg id="bar"></svg>
-                </div>
+                <!--<div class="panel-body">-->
+                    <!--<svg id="heatmap"></svg>-->
+                <!--</div>-->
+                <!--<div class="chart-container">-->
+                    <!--<svg id="bar"></svg>-->
+                <!--</div>-->
             </div>
         </div>
         <div id="footer">
@@ -45,8 +48,13 @@
         </div> <!--footer-->
 
         <script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"></script>
-        <script src="static/js/bars.js"></script>
-        <script src="static/js/heatmap.js"></script>
+        {{if eq .Env "testing"}}
+            <script src="static/js/bars.js"></script>
+            <script src="static/js/heatmap.js"></script>
+        {{else}}
+            <script src="static/js/master.min.js"></script>
+        {{end}}
+
     </body>
 </html>
 
