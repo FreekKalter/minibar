@@ -23,7 +23,6 @@ var bars_svg = d3.select("#bar")
     .attr("transform", "translate(" + bars_margin.left + "," + bars_margin.top + ")");
 
 function plotBars(day){
-    console.log("called plotBars with " + day);
     var bars_httpRequest = new XMLHttpRequest();
     bars_httpRequest.onreadystatechange = function () {
         var data = [];
