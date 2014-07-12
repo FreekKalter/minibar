@@ -9,8 +9,11 @@ CSS_FILES = $(filter-out %.min.css,$(wildcard \
 ))
 
 # Command to run to execute the YUI Compressor.
-YUI_COMPRESSOR = /usr/bin/yui-compressor
-YUI_COMPRESSOR = /usr/local/bin/yuicompressor
+ifeq ($(shell uname), Linux)
+	YUI_COMPRESSOR = /usr/bin/yui-compressor
+else
+	YUI_COMPRESSOR = /usr/local/bin/yuicompressor
+endif
 
 # Flags to pass to the YUI Compressor for both CSS and JS.
 YUI_COMPRESSOR_FLAGS = --charset utf-8 --verbose
@@ -40,3 +43,5 @@ $(js-loc)/master.min.js: $(js-loc)/master.js
 minify-js: webapp/static/js/master.min.js
 # target: minify - Minifies CSS and JS.
 minify: minify-css minify-js
+
+all: minify webapp/webapp

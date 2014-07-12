@@ -28,10 +28,7 @@ def deploy():
     sudo('service minibar restart')
 
 def container_deploy():
-    with lcd('webapp'):
-        local('go build')
-
-    local('docker build -t freekkalter/wkiw-app .')
+    build()
     local('docker push freekkalter/wkiw-app')
 
     run('docker pull freekkalter/wkiw-app')
@@ -45,4 +42,17 @@ def container_deploy():
 
     run('docker run -d -e VIRTUAL_HOST=wanneerkanikwinnen.nl -v /home/fkalter/minibar-deploy:/logdir\
             --name=wkiw-app freekkalter/wkiw-app')
+
+def local_run():
+    build()
+    with settings(hide('warnings'), warn_only=True):
+        local('docker kill wkiw-app')
+        local('docker rm wkiw-app')
+
+    local('docker run -d -v /home/fkalter/github/minibar:/logdir --name=wkiw-app  -p 8000:80 freekkalter/wkiw-app')
+
+def build():
+    local('make all')
+
+    local('docker build -t freekkalter/wkiw-app .')
 
