@@ -19,20 +19,25 @@ endif
 YUI_COMPRESSOR_FLAGS = --charset utf-8 --verbose
 
 # -----------------  Css minifying -------------
-# Patterns matching CSS files that should be minified.
-# Files with a .min.css suffix will be ignored.
+css-loc = webapp/static/css
+## Patterns matching CSS files that should be minified.
+## Files with a .min.css suffix will be ignored.
 CSS_FILES = $(filter-out %.min.css,$(wildcard \
-	webapp/static/css/*.css \
+	$(css-loc)/*.css \
 ))
 
-CSS_MINIFIED = $(CSS_FILES:.css=.min.css)
+# Combine all css files into one
+$(css-loc)/master.css: $(CSS_FILES)
+	cat $(CSS_FILES) > $(css-loc)/master.css
 
-%.min.css: %.css
-	@echo '==> Minifying $<'
-	$(YUI_COMPRESSOR) $(YUI_COMPRESSOR_FLAGS) --type css $< >$@
+# minify the master css file
+$(css-loc)/master.min.css: $(css-loc)/master.css
+	 -$(YUI_COMPRESSOR) $(YUI_COMPRESSOR_FLAGS) --type css $(css-loc)/master.css \
+	 > $(css-loc)/master.min.css
+	 rm $(css-loc)/master.css
 
 # target: minify-css - Minifies CSS.
-minify-css: $(CSS_FILES) $(CSS_MINIFIED)
+minify-css: $(css-loc)/master.min.css
 
 # -----------------  Javascript minifying -------------
 js-loc = webapp/static/js
@@ -51,7 +56,7 @@ $(js-loc)/master.min.js: $(js-loc)/master.js
 	 rm $(js-loc)/master.js
 
 # target: minify-js - Minifies JS.
-minify-js: webapp/static/js/master.min.js
+minify-js: $(js-loc)/master.min.js
 
 .PHONY: clean
 clean:
