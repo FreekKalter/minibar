@@ -1,6 +1,5 @@
 ## shortterm
 
-* compress static shit (use makefile from km app)
 * save logs outside of container ( Docker volumes)
 * analyze nginx logs, get statistics ( visitors, loadtime, etc.)
 * better highlight of active day
