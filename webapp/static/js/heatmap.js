@@ -93,6 +93,10 @@ legend.append("text")
 
 // plot current day and make ik active in heatmap
 today = new Date().getDay();
+// TODO: fix this dirty fucking hack
+if (today == 0) {
+   today = 7;
+}
 plotBars(today-1);
 makeDayActive(today);
 });
