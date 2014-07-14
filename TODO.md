@@ -1,5 +1,6 @@
 ## shortterm
 
+* configure nginx in wkiw-app to log real ip and not that of the proxy
 * better highlight of active day
 * add expire headers (via nginx?)
 * security check, sanityze all points of input
