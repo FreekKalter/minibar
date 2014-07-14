@@ -4,30 +4,8 @@ env.use_ssh_config = True
 env.hosts.extend(['fkalter@km-app.kalteronline.org'])
 
 deploypath = '/home/fkalter/minibar-deploy'
+
 def deploy():
-    # build webapp
-    with lcd('webapp'):
-        local('go build')
-
-    # prepare remote env
-    run('mkdir -p '+deploypath)
-    put('minibar.conf', '/etc/init', use_sudo=True)
-    sudo('chown root:root /etc/init/minibar.conf')
-    sudo('chmod u=rw,o=,g= /etc/init/minibar.conf')
-
-    # upload files
-    put('minibar.py', deploypath )
-
-    # dirty fucking hack, putting of local webapp does not work
-    # if remote file has different permission, so delete it first
-    run('rm '+deploypath+'/webapp/webapp')
-    put('webapp', deploypath )
-    run('chmod +x '+deploypath+'/webapp/webapp')
-
-    # restart service
-    sudo('service minibar restart')
-
-def container_deploy():
     build()
     local('docker push freekkalter/wkiw-app')
 
@@ -40,7 +18,9 @@ def container_deploy():
         run('docker kill wkiw-app')
         run('docker rm wkiw-app')
 
-    run('docker run -d -e VIRTUAL_HOST=wanneerkanikwinnen.nl -v /home/fkalter/minibar-deploy:/logdir\
+    run('docker run -d -e VIRTUAL_HOST=wanneerkanikwinnen.nl\
+            -v /home/fkalter/minibar-deploy:/logdir\
+            -v /home/fkalter/minibar-nginx-log/:/var/log/nginx\
             --name=wkiw-app freekkalter/wkiw-app')
 
 def local_run():
@@ -49,7 +29,7 @@ def local_run():
         local('docker kill wkiw-app')
         local('docker rm wkiw-app')
 
-    local('docker run -d -v /home/fkalter/github/minibar:/logdir --name=wkiw-app  -p 8000:80 freekkalter/wkiw-app')
+    local('docker run -d -v /home/fkalter/github/minibar:/logdir -v /home/fkalter/github/minibar/nginx-log:/var/log/nginx --name=wkiw-app  -p 8000:80 freekkalter/wkiw-app')
 
 def build():
     local('make all')
