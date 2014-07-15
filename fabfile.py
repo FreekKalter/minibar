@@ -46,6 +46,10 @@ def build(all=False):
         with lcd('wkiw-docker-base'):
             local('docker build -t freekkalter/wkiw-docker-base .')
     local('docker build -t freekkalter/wkiw-app .')
+    cleanup()
+
+def cleanup():
+    local('rm index.html')
 
 def fingerprint_static():
     files = ['webapp/static/js/master.min.js', 'webapp/static/css/master.min.css']

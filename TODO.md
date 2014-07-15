@@ -1,10 +1,11 @@
 ## shortterm
 
-* better highlight of active day
+* cleanup (hash)-master.min.* files in fabric script
 * security check, sanityze all points of input
+* better highlight of active day
 * 404 page styling
 * make a landing page with links to specific actions
-    * add more actions
+    * add more promotions
 
 ## midterm
 
