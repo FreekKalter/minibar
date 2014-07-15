@@ -1,8 +1,7 @@
 ## shortterm
 
-* configure nginx in wkiw-app to log real ip and not that of the proxy
 * better highlight of active day
-* add expire headers (via nginx?)
+* add fingerprinting (hash of file content) to static assets for caching
 * security check, sanityze all points of input
 * 404 page styling
 * make a landing page with links to specific actions

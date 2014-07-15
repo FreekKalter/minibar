@@ -24,7 +24,7 @@ def deploy():
             --name=wkiw-app freekkalter/wkiw-app')
 
 def local_run():
-    build()
+    build(all=True)
     with settings(hide('warnings'), warn_only=True):
         local('docker run -d -t -p 8000:80 -v /var/run/docker.sock:/tmp/docker.sock \
                 --name=nginx_proxy jwilder/nginx-proxy')
@@ -36,8 +36,10 @@ def local_run():
             -e VIRTUAL_HOST=localhost\
             --name=wkiw-app freekkalter/wkiw-app')
 
-def build():
+def build(all=False):
     local('make all')
-
     local('docker build -t freekkalter/wkiw-app .')
+    if all:
+        with lcd('wkiw-docker-base'):
+            local('docker build -t freekkalter/wkiw-docker-base .')
 
