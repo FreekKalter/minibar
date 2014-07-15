@@ -1,7 +1,6 @@
 ## shortterm
 
 * better highlight of active day
-* add fingerprinting (hash of file content) to static assets for caching
 * security check, sanityze all points of input
 * 404 page styling
 * make a landing page with links to specific actions

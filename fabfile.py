@@ -1,4 +1,7 @@
 from fabric.api import *
+import hashlib
+import shutil
+from os import path
 env.ssh_config_path = '/var/lib/jenkins/.ssh/config'
 env.use_ssh_config = True
 env.hosts.extend(['fkalter@km-app.kalteronline.org'])
@@ -38,8 +41,27 @@ def local_run():
 
 def build(all=False):
     local('make all')
-    local('docker build -t freekkalter/wkiw-app .')
+    fingerprint_static()
     if all:
         with lcd('wkiw-docker-base'):
             local('docker build -t freekkalter/wkiw-docker-base .')
+    local('docker build -t freekkalter/wkiw-app .')
 
+def fingerprint_static():
+    files = ['webapp/static/js/master.min.js', 'webapp/static/css/master.min.css']
+    index = ''
+    with open('webapp/index.html', 'r') as fh:
+        index = fh.read()
+    for f in files:
+        (base, filename) = path.split(f)
+        sha = hashlib.sha256()
+        with open(f, 'r') as content:
+            # calculate hash of filecontent
+            sha.update(content.read())
+            newname = path.join(base ,sha.hexdigest()[:10] + '-' + filename)
+            # substitute filenames in index.html
+            index = index.replace(f.replace('webapp/', ''), newname.replace('webapp/', ''))
+            shutil.copy2(f, newname)
+
+    with open('index.html', 'w') as fh:
+        fh.write(index)
