@@ -26,10 +26,15 @@ def deploy():
 def local_run():
     build()
     with settings(hide('warnings'), warn_only=True):
+        local('docker run -d -t -p 8000:80 -v /var/run/docker.sock:/tmp/docker.sock \
+                --name=nginx_proxy jwilder/nginx-proxy')
         local('docker kill wkiw-app')
         local('docker rm wkiw-app')
 
-    local('docker run -d -v /home/fkalter/github/minibar:/logdir -v /home/fkalter/github/minibar/nginx-log:/var/log/nginx --name=wkiw-app  -p 8000:80 freekkalter/wkiw-app')
+    local('docker run -d -v /home/fkalter/github/minibar:/logdir\
+            -v /home/fkalter/github/minibar/nginx-log:/var/log/nginx\
+            -e VIRTUAL_HOST=localhost\
+            --name=wkiw-app freekkalter/wkiw-app')
 
 def build():
     local('make all')
