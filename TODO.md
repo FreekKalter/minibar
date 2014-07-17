@@ -11,7 +11,6 @@
 
 * write a *better* introduction for the whole site
     * and per brand, what the promotion is, link to the site
-* get a info@domain working, practicly a whole mailserver
 * place adds
 
 ## longterm
