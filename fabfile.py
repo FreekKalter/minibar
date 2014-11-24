@@ -1,7 +1,9 @@
 from fabric.api import *
 import hashlib
 import shutil
-from os import path
+import path as path
+import re
+
 env.ssh_config_path = '/var/lib/jenkins/.ssh/config'
 env.use_ssh_config = True
 env.hosts.extend(['fkalter@km-app.kalteronline.org'])
@@ -52,20 +54,27 @@ def cleanup():
     local('rm index.html')
 
 def fingerprint_static():
-    files = ['webapp/static/js/master.min.js', 'webapp/static/css/master.min.css']
+    files = [path.path('webapp/static/js/master.min.js'), path.path('webapp/static/css/master.min.css')]
     index = ''
     with open('webapp/index.html', 'r') as fh:
         index = fh.read()
     for f in files:
-        (base, filename) = path.split(f)
+        (base, filename) = f.splitpath()
         sha = hashlib.sha256()
         with open(f, 'r') as content:
             # calculate hash of filecontent
             sha.update(content.read())
-            newname = path.join(base ,sha.hexdigest()[:10] + '-' + filename)
-            # substitute filenames in index.html
-            index = index.replace(f.replace('webapp/', ''), newname.replace('webapp/', ''))
-            shutil.copy2(f, newname)
+            newname = base.joinpath(sha.hexdigest()[:10] + '-' + filename)
+            if not newname.isfile():
+                # substitute filenames in index.html  ( static/js/master.min.js --> static/js/07ee6ffb9f-master.min.js )
+                index = index.replace(f.replace('webapp/', ''), newname.replace('webapp/', ''))
+                shutil.copy2(f, newname)
+                # delete old fingerprinted files
+                for toDelete in path.path(base).files():
+                    if toDelete.name != newname.name and re.match('[0-9a-f]{10}.*', toDelete.name, flags=re.IGNORECASE):
+                        toDelete.unlink()
+
+
 
     with open('index.html', 'w') as fh:
         fh.write(index)

@@ -24,6 +24,7 @@ def get_participants():
         print(e)
     soup = BeautifulSoup(r.text)
     par = soup.find("span", "participants").string
+    #TODO: handle error before converting to string
     return par.lstrip('0')
 
 def write_new_participants(l, par):

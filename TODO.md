@@ -1,6 +1,8 @@
 ## shortterm
 
-* cleanup (hash)-master.min.* files in fabric script
+* make two dockerfiles, one for the scirpt (with all python dependencys)
+    - one for the webapp, from the offical golang, build the app in the container
+
 * security check, sanityze all points of input
 * better highlight of active day
 * 404 page styling
