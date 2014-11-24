@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/http/fcgi"
 	"os"
 	"regexp"
 	"sort"
@@ -35,16 +35,23 @@ func (t TupleList) Less(i, j int) bool {
 }
 
 type Config struct {
-	BrandList    map[string]string
-	Port, Method string
-	Logdir       string
-	Env          string
+	BrandList map[string]string
+	Port      string
+	Env       string
 }
 
-var config Config
-var templates *template.Template
+var (
+	config    Config
+	templates *template.Template
+	inputDir  string
+)
+
+func init() {
+	flag.StringVar(&inputDir, "inputDir", "/", "location where to look for the log files")
+}
 
 func main() {
+	flag.Parse()
 	var err error
 	configFile, err := ioutil.ReadFile("config.json")
 	if err != nil {
@@ -72,19 +79,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if config.Method == "local" {
-		fmt.Println("listening for http on port " + config.Port)
-		err = http.Serve(listener, nil)
-	} else if config.Method == "fcgi" {
-		fmt.Println("listening for http on port " + config.Port)
-		err = fcgi.Serve(listener, nil)
-	} else if config.Method == "webserver" {
-		err = http.ListenAndServe(":80", r)
-	}
+	fmt.Printf("listening for http on port %s\n", config.Port)
+	err = http.Serve(listener, nil)
 	if err != nil {
 		panic(err)
 	}
 }
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if err := templates.Execute(w, config); err != nil {
 		panic(err)
@@ -99,7 +100,7 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Onbekend merk", 404)
 		return
 	} else {
-		f, err = os.Open(config.Logdir + "/" + filename)
+		f, err = os.Open(inputDir + "/" + filename)
 		if err != nil {
 			panic(err)
 		}

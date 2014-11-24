@@ -3,8 +3,6 @@
         "grolsch": "out.log",
         "amstel": "amstel.log"
     },
-    "Logdir": "..",
     "Port": ":5000",
-    "Method": "local",
     "Env": "testing"
 }
