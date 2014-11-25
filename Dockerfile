@@ -1,11 +1,8 @@
-FROM freekkalter/wkiw-docker-base
+FROM python:2.7.8
 
-# setup app
-RUN mkdir /app
-WORKDIR /app
-ADD ./webapp/ /app
-# replace "testing" files in webapp dir with production ones
-ADD ./index.html /app/index.html
-ADD ./config.json /app/config.json
-RUN chmod +x /app/webapp
+RUN pip install pytz beautifulsoup4 requests
 
+ADD minibar.py /minibar.py
+RUN chmod +x /minibar.py
+
+CMD ["/minibar.py", "--output", "/log/out.log"]

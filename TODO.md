@@ -1,6 +1,5 @@
 ## shortterm
 
-* make dockerfile for the scirpt (with all python dependencys)
 * security check, sanityze all points of input
 * better highlight of active day
 * 404 page styling

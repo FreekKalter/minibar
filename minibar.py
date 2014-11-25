@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from __future__ import print_function
 from bs4 import BeautifulSoup
 import requests
@@ -5,6 +6,7 @@ from datetime import datetime
 import re
 import sys
 import time
+import argparse
 from pytz import timezone
 import pytz
 
@@ -23,8 +25,11 @@ def get_participants():
         print("CONNECTION EXCEPTION")
         print(e)
     soup = BeautifulSoup(r.text)
-    par = soup.find("span", "participants").string
-    #TODO: handle error before converting to string
+    try:
+        par = soup.find("span", "participants").string
+    except AttributeError as e:
+        print(e)
+        sys.exit(1)
     return par.lstrip('0')
 
 def write_new_participants(l, par):
@@ -33,32 +38,39 @@ def write_new_participants(l, par):
     with open('out.log', 'w') as out:
         out.writelines(lines)
 
-lines = []
-try:
-    with open('out.log', 'r') as log:
-        lines = log.readlines()
-except IOError as e:
-    write_new_participants(lines,get_participants())
-
-print(utc.localize(datetime.utcnow()).strftime(RFC1123))
-highpar = -1
-for i in range(18):
-    if i != 0:
-        time.sleep(20-i)
-    par = get_participants()
+def main():
+    parser = argparse.ArgumentParser(description='scrape website for submission statistics')
+    parser.add_argument('-o','--output', default="./out.log")
+    args = parser.parse_args()
+    lines = []
     try:
-        if int(par) > highpar:
-            highpar = int(par)
-            print(highpar)
-        elif int(par) < highpar:
-            print("number of times checked before exiting: " + str(i))
-            break
-    except ValueError as e:
-        print(e)
-        continue
+        with open(args.output, 'r') as log:
+            lines = log.readlines()
+    except IOError as e:
+        write_new_participants(lines,get_participants())
 
-session.close()
-if highpar >= 0:
-    print("writing: "+ str(highpar))
-    write_new_participants(lines, highpar)
-print("----------------------------------------")
+    print(utc.localize(datetime.utcnow()).strftime(RFC1123))
+    highpar = -1
+    for i in range(18):
+        if i != 0:
+            time.sleep(20-i)
+        par = get_participants()
+        try:
+            if int(par) > highpar:
+                highpar = int(par)
+                print(highpar)
+            elif int(par) < highpar:
+                print("number of times checked before exiting: " + str(i))
+                break
+        except ValueError as e:
+            print(e)
+            continue
+
+    session.close()
+    if highpar >= 0:
+        print("writing: "+ str(highpar))
+        write_new_participants(lines, highpar)
+    print("----------------------------------------")
+
+if __name__ == "__main__":
+    main()
